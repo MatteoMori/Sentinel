@@ -1,2 +1,2 @@
-# SolarBreach
+# Luna
 MCP Server | Kubernetes
