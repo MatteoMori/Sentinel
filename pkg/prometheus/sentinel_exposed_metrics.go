@@ -4,7 +4,10 @@ This is where we define the metrics exposed by Sentinel.
 
 package prometheus
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"github.com/MatteoMori/sentinel/pkg/shared"
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 /*
 NOTES:
@@ -13,45 +16,74 @@ NOTES:
 
 METRICS Definition
 
- 1. ServiceQualityScore:
-    -> sentinel_service_quality_score{namespace="team-a", deployment="web-api"} 76
+ 1. SentinelContainerImageInfo:
+	-> sentinel_container_image_info{
+		namespace="prod",
+		workload_type="Deployment",           // Deployment, StatefulSet, DaemonSet, CronJob
+		workload_name="api-server",
+		container_name="app",
+		image="ghcr.io/myorg/myapp:v1.2.3",   // Full image string
+		image_registry="ghcr.io",             // Parsed registry
+		image_repository="myorg/myapp",       // Parsed repo
+		image_tag="v1.2.3",                   // Parsed tag
+		# Dynamic labels from extraLabels config are appended here
+	  } 1
 
- 2. ServiceQualityRuleScore:
-    -> sentinel_service_quality_rule_score{namespace="team-a", deployment="web-api", rule="readiness_probe"} 10
-    -> sentinel_service_quality_rule_score{namespace="team-a", deployment="web-api", rule="owner_label"} 0
 
- 3. ServiceQualityRuleStatus:
-    -> sentinel_service_quality_rule_status{namespace="team-a", deployment="web-api", rule="readiness_probe"} 1
-    -> sentinel_service_quality_rule_status{namespace="team-a", deployment="web-api", rule="readiness_probe"} 0
 */
 
 var (
-	ServiceQualityScore = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "sentinel_service_quality_score",
-			Help: "Aggregated Service Quality Score for an application",
-		},
-		[]string{"namespace", "deployment"},
-	)
+	/*
+	 SentinelContainerImageInfo is built dynamically based on extraLabels configuration
+	 It's initialized by calling BuildMetrics() at startup
+	*/
+	SentinelContainerImageInfo *prometheus.GaugeVec
 
-	// Score of each individual rule. Labeled to filter by a few parameters
-	ServiceQualityRuleScore = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "sentinel_service_quality_rule_score",
-			Help: "Individual Service Quality Rule Score for an application",
+	// SentinelImageChangesTotal tracks every time a container's image tag changes
+	// This is a counter that increments whenever we detect an image update
+	SentinelImageChangesTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "sentinel_image_changes_total",
+			Help: "Total number of container image changes detected",
 		},
-		[]string{"namespace", "deployment", "rule"},
-	)
-
-	// Status of each individual rule. Labeled to filter by a few parameters
-	ServiceQualityRuleStatus = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "sentinel_service_quality_rule_status",
-			Help: "Individual Service Quality Rule Status for an application",
+		[]string{
+			"namespace",
+			"workload_type",
+			"workload_name",
+			"container_name",
+			"old_image_tag",
+			"new_image_tag",
 		},
-		[]string{"namespace", "deployment", "rule"},
 	)
-
-	// TODO: NEW metrics - Expose the weight of a rule
-	// TODO: NEW metrics - Expose the Total possible score of a rule
 )
+
+/*
+BuildMetrics constructs the Prometheus metrics with dynamic labels based on configuration
+This must be called before registering metrics with the Prometheus registry
+*/
+func BuildMetrics(extraLabels []shared.ExtraLabel) {
+	// Base labels that are always present
+	baseLabels := []string{
+		"namespace",
+		"workload_type",
+		"workload_name",
+		"container_name",
+		"image",
+		"image_registry",
+		"image_repository",
+		"image_tag",
+	}
+
+	// Append extra label names from configuration
+	for _, el := range extraLabels {
+		baseLabels = append(baseLabels, el.TimeseriesLabelName) // comes from pkg/shared/sentinel_config.go
+	}
+
+	SentinelContainerImageInfo = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "sentinel_container_image_info",
+			Help: "Information about container images used in workloads",
+		},
+		baseLabels,
+	)
+}

@@ -6,10 +6,17 @@ metadata:
   namespace: kube-system
 data:
   sentinel.yaml: |-
-    NamespaceSelector:
+    namespaceSelector:
       "sentinel.io/controlled": "enabled"
     metricsPort: "9090"
     verbosity: 1
+    extraLabels:
+      - type: "annotation"
+        key: "sentinel.io/owner"
+        timeseriesLabelName: "owner"
+      - type: "label"
+        key: "environment"
+        timeseriesLabelName: "environment"
 
 ---
 apiVersion: apps/v1

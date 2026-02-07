@@ -1,14 +1,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: luna
+  name: sentinel
   namespace: kube-system
   labels:
     release: prometheus
 spec:
   selector:
     matchLabels:
-      app: luna-controller
+      app: sentinel-controller
   namespaceSelector:
     matchNames:
       - kube-system

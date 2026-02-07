@@ -11,15 +11,19 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/MatteoMori/sentinel/pkg/shared"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func Init(metricsPort string) {
-	// Register metrics
-	prometheus.MustRegister(ServiceQualityScore)
-	prometheus.MustRegister(ServiceQualityRuleScore)
-	prometheus.MustRegister(ServiceQualityRuleStatus)
+// Init initializes and registers Prometheus metrics, then starts the metrics HTTP server
+func Init(metricsPort string, extraLabels []shared.ExtraLabel) {
+	// Build metrics with dynamic labels based on configuration
+	BuildMetrics(extraLabels)
+
+	// Register metrics with Prometheus
+	prometheus.MustRegister(SentinelContainerImageInfo)
+	prometheus.MustRegister(SentinelImageChangesTotal)
 
 	// Start HTTP server in their Go Routine so that it does not block the main thread
 	go func() {

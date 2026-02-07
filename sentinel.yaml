@@ -1,4 +1,12 @@
-NamespaceSelector:
+namespaceSelector:
   "sentinel.io/controlled": "enabled"
 metricsPort: "9090"
 verbosity: 1
+
+extraLabels:
+  - type: "annotation"
+    key: "sentinel.io/owner"
+    timeseriesLabelName: "owner"
+  - type: "label"
+    key: "environment"
+    timeseriesLabelName: "environment"
