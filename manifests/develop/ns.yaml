@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-app
+  labels:
+    "sentinel.io/controlled": "enabled"
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-app2
+  labels:
+    "sentinel.io/controlled": "enabled"
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-app3
+  labels:
+    "sentinel.io/controlled": "false"

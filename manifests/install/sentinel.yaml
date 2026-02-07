@@ -1,0 +1,100 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sentinel-config
+  namespace: kube-system
+data:
+  sentinel.yaml: |-
+    NamespaceSelector:
+      "sentinel.io/controlled": "enabled"
+    metricsPort: "9090"
+    verbosity: 1
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinel-controller
+  namespace: kube-system
+  labels:
+    app: sentinel-controller
+spec:
+  selector:
+    matchLabels:
+      app: sentinel-controller
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sentinel-controller
+    spec:
+      serviceAccountName: sentinel
+      containers:
+        - name: server
+          image: sentinel:latest
+          args:
+            - "start"
+            - "-v=2"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: sentinel-config
+              mountPath: /etc/sentinel/sentinel.yaml
+              subPath: sentinel.yaml
+      volumes:
+        - name: sentinel-config
+          configMap:
+            name: sentinel-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinel-metrics 
+  namespace: kube-system   
+  labels:
+   app: sentinel-controller           
+spec:
+  selector:
+    app: sentinel-controller       
+  ports:
+    - name: prometheus-metrics
+      protocol: TCP              
+      port: 9090                 
+      targetPort: 9090                        
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sentinel
+  namespace: kube-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: kube-system
+  name: sentinel
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["apps"] 
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"] 
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sentinel
+  namespace: kube-system
+subjects:
+- kind: ServiceAccount
+  name: sentinel
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: sentinel
+  apiGroup: rbac.authorization.k8s.io

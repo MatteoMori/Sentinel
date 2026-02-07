@@ -1,0 +1,4 @@
+NamespaceSelector:
+  "sentinel.io/controlled": "enabled"
+metricsPort: "9090"
+verbosity: 1
