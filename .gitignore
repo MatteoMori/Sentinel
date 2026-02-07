@@ -8,8 +8,8 @@
 *.so
 *.dylib
 
-# Project binary
-sentinel
+# Project binary (only in root directory)
+/sentinel
 
 # Test binary, built with `go test -c`
 *.test
