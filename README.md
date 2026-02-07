@@ -10,6 +10,28 @@ Sentinel monitors Kubernetes workloads across labeled namespaces and tracks whic
 
 <br>
 
+- [Sentinel](#sentinel)
+  - [Why Sentinel?](#why-sentinel)
+  - [Quick Start](#quick-start)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Metrics Exposed](#metrics-exposed)
+    - [`sentinel_container_image_info`](#sentinel_container_image_info)
+    - [`sentinel_image_changes_total`](#sentinel_image_changes_total)
+  - [Dynamic Label Enrichment](#dynamic-label-enrichment)
+  - [⚙️ Configuration](#️-configuration)
+    - [1. Config file (`/etc/sentinel/sentinel.yaml`)](#1-config-file-etcsentinelsentinelyaml)
+    - [2. Environment variables](#2-environment-variables)
+    - [3. CLI flags](#3-cli-flags)
+    - [Configuration Reference](#configuration-reference)
+  - [📊 Grafana Dashboard](#-grafana-dashboard)
+  - [Local Development](#local-development)
+    - [Build and Run Locally](#build-and-run-locally)
+    - [Test with KIND](#test-with-kind)
+  - [🌟 Project Status](#-project-status)
+
+<br>
+
 ## Why Sentinel?
 
 Gain real-time visibility into your cluster's container image landscape. Perfect for:
@@ -218,9 +240,9 @@ A pre-built Grafana dashboard is included in [`dashboard/grafana.json`](dashboar
 - **Registry distribution** – Donut chart showing image count by registry
 - **Change tracking log** – Table of all detected image changes with old → new tags
 
+![example](./images/dashboard.png)
 
-
----
+<br>
 
 ## Local Development
 
