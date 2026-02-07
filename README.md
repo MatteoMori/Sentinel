@@ -89,7 +89,7 @@ Info metric (Gauge, always `1`) providing a full inventory of container images r
 
 | Label | Description | Example |
 |-------|-------------|---------|
-| `namespace` | Kubernetes namespace | `production` |
+| `workload_namespace` | Kubernetes namespace | `production` |
 | `workload_type` | Kind of workload | `Deployment` |
 | `workload_name` | Name of the workload | `api-server` |
 | `container_name` | Container within the workload | `nginx` |
@@ -103,7 +103,7 @@ Info metric (Gauge, always `1`) providing a full inventory of container images r
 
 ```prometheus
 sentinel_container_image_info{
-  namespace="production",
+  workload_namespace="production",
   workload_type="Deployment",
   workload_name="api-server",
   container_name="nginx",
@@ -125,7 +125,7 @@ Counter that increments every time a container's image tag changes, providing an
 
 | Label | Description | Example |
 |-------|-------------|---------|
-| `namespace` | Kubernetes namespace | `production` |
+| `workload_namespace` | Kubernetes namespace | `production` |
 | `workload_type` | Kind of workload | `Deployment` |
 | `workload_name` | Name of the workload | `api-server` |
 | `container_name` | Container within the workload | `nginx` |
@@ -136,7 +136,7 @@ Counter that increments every time a container's image tag changes, providing an
 
 ```prometheus
 sentinel_image_changes_total{
-  namespace="production",
+  workload_namespace="production",
   workload_type="Deployment",
   workload_name="api-server",
   container_name="nginx",
@@ -152,7 +152,7 @@ sentinel_image_changes_total{
 sum(increase(sentinel_image_changes_total[24h]))
 
 # Alert: too many image changes in production
-sentinel_image_changes_total{namespace="production"} > 5
+sentinel_image_changes_total{workload_namespace="production"} > 5
 
 # Find containers still using :latest
 sentinel_container_image_info{image_tag="latest"}

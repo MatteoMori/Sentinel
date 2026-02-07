@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 32,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -446,7 +446,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sentinel_container_image_info",
+          "expr": "sentinel_container_image_info{workload_namespace=~\"$namespace\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -552,7 +552,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "count by (image_registry) (sentinel_container_image_info)",
+          "expr": "count by (image_registry) (sentinel_container_image_info{workload_namespace=~\"$namespace\"})",
           "format": "time_series",
           "instant": true,
           "legendFormat": "{{image_registry}}",
@@ -706,7 +706,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sentinel_image_changes_total",
+          "expr": "sentinel_image_changes_total{workload_namespace=~\"$namespace\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -761,15 +761,41 @@
     "containers"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "definition": "label_values(sentinel_container_image_info,workload_namespace)",
+        "includeAll": true,
+        "label": "namespace",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(sentinel_container_image_info,workload_namespace)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Sentinel - Container Image Tracking",
   "uid": "addk6s7",
-  "version": 4
+  "version": 7
 }

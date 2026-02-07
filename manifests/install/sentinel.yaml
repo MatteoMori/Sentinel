@@ -87,8 +87,8 @@ rules:
 - apiGroups: [""]
   resources: ["namespaces"]
   verbs: ["get", "watch", "list"]
-- apiGroups: ["apps"] 
-  resources: ["deployments"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
   verbs: ["get", "list", "watch"] 
 
 ---

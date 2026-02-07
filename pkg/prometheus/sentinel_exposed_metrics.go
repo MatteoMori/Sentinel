@@ -12,13 +12,13 @@ import (
 /*
 NOTES:
 - A Gauge is a metric that represents a single numerical value that can go up or down
-- A GaugeVec is a collection of Gauges, partitioned by labels (here: namespace and deployment).
+- A GaugeVec is a collection of Gauges, partitioned by labels (here: workload_namespace and deployment).
 
 METRICS Definition
 
  1. SentinelContainerImageInfo:
 	-> sentinel_container_image_info{
-		namespace="prod",
+		workload_namespace="prod",
 		workload_type="Deployment",           // Deployment, StatefulSet, DaemonSet, CronJob
 		workload_name="api-server",
 		container_name="app",
@@ -47,7 +47,7 @@ var (
 			Help: "Total number of container image changes detected",
 		},
 		[]string{
-			"namespace",
+			"workload_namespace",
 			"workload_type",
 			"workload_name",
 			"container_name",
@@ -64,7 +64,7 @@ This must be called before registering metrics with the Prometheus registry
 func BuildMetrics(extraLabels []shared.ExtraLabel) {
 	// Base labels that are always present
 	baseLabels := []string{
-		"namespace",
+		"workload_namespace",
 		"workload_type",
 		"workload_name",
 		"container_name",
